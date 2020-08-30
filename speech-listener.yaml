@@ -1,8 +1,0 @@
-version: "3.6"
-
-services:
-  rhvoice_rest:
-    image: aculeasis/rhvoice-rest:arm32v7
-    ports: 
-      - 8080:8080
-    container_name: assistant_rhvoice_rest
