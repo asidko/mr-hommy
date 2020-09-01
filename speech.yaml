@@ -6,14 +6,20 @@ services:
     image: aculeasis/rhvoice-rest:arm32v7
     ports: 
       - 8080:8080
-    
+
+  rhvoice_rest_simple:
+    container_name: assistant_rhvoice_rest_simpble
+    build: ./rhvoice_rest_simple
+    ports:
+      - 8000:8080
+
   speaker:
     container_name: assistant_speaker
     build: ./speaker
     ports:
       - 5000:5000
     environment:
-      RHVOICE_API_URL: rhvoice_rest:8080
+      RHVOICE_API_URL: rhvoice_rest_simple:8000
     devices:
       - /dev/snd
     depends_on: ["rhvoice_rest"]

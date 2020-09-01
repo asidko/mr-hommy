@@ -17,7 +17,7 @@ else:
 
 app = Flask(__name__) 
 
-RHVOICE_API_URL = environ.get('RHVOICE_API_URL') or 'http://wrpi.local:8080'
+RHVOICE_API_URL = environ.get('RHVOICE_API_URL') or 'http://localhost:8000'
 
 ###################################
 # REST endpoints
