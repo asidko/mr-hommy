@@ -8,7 +8,7 @@ data_path = "/opt/data"
 
 @app.route('/say')
 def say():
-    textArg = request.args.get('text')
+    textArg = request.args.get('text') or 'привет'
     voiceArg = request.args.get('voice')
 
     text = re.sub('[\r\n]',' ', urllib.parse.unquote(textArg))
