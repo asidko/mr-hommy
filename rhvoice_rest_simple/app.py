@@ -5,6 +5,7 @@ from shlex import quote
 app = Flask(__name__, static_url_path='')
 data_path = "/opt/data"
 
+DEFAULT_VOICE = os.environ.get('DEFAULT_VOICE') or 'anna'
 
 @app.route('/say')
 def say():
@@ -18,7 +19,7 @@ def say():
     file_name = m.hexdigest()
     file_path = os.path.join(data_path, file_name)
 
-    voice = "-p anna" if voiceArg is None else "-p %s" % (voiceArg)
+    voice = "-p %s" % (DEFAULT_VOICE) if voiceArg is None else "-p %s" % (voiceArg)
 
     cmd = "echo %s | RHVoice-test %s -o %s.wav && lame %s.wav %s.mp3" % (quote(text), voice, file_path, file_path, file_path)
     subprocess.call([cmd], shell=True)
@@ -32,4 +33,4 @@ def say():
     return send_from_directory(data_path, "%s.wav" % (file_name))
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=80)

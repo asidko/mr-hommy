@@ -1,26 +1,40 @@
 version: "3.6"
 
+#####
+# Voices:
+#   aleksandr|anna|elena|irina| # Russian
+#   alan|bdl|clb|slt| # English
+#   spomenka| # Esperanto
+#   natia| # Georgian
+#   azamat|nazgul| # Kyrgyz
+#   talgat| # Tatar
+#   anatol|natalia # Ukrainian
+######
+
 services:
+
+  # Voice produce service - generates wav/mp3 files
+  # Example: http://localhost:7050/say?text=крутая+озвучка&voice=anna
   rhvoice_rest:
     container_name: assistant_rhvoice_rest
-    image: aculeasis/rhvoice-rest:arm32v7
-    ports: 
-      - 8080:8080
-
-  rhvoice_rest_simple:
-    container_name: assistant_rhvoice_rest_simpble
     build: ./rhvoice_rest_simple
     ports:
-      - 8000:8080
+      - 7050:80
+    environment:
+      DEFAULT_VOICE: aleksandr
 
+  # Speaker service - play sound by url using VLC player
+  # Example: http://localhost:8050/say?text=класна+озвучка&voice=anatol
+  # Important! To hear the sound, connect your device to speakers or headphones.
   speaker:
     container_name: assistant_speaker
     build: ./speaker
     ports:
-      - 5000:5000
+      - 8050:8080
     environment:
-      RHVOICE_API_URL: http://rhvoice_rest_simple:8080
+      RHVOICE_API_URL: http://rhvoice_rest
     devices:
       - /dev/snd
-    depends_on: ["rhvoice_rest"]
+    depends_on:
+      - rhvoice_rest
 
