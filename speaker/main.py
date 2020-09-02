@@ -23,13 +23,14 @@ RHVOICE_API_URL = environ.get('RHVOICE_API_URL') or 'http://localhost:8000'
 # REST endpoints
 ###################################
 
+@app.route('/say')
 @app.route('/') 
 def say_as_get_param():
 	text = request.args.get('text') or "привет"
 	play(text)
 	return text
-  
-@app.route('/text/<the_text>') 
+
+@app.route('/text/<the_text>')
 def say_as_path_variable(the_text):
 	text = the_text or "привет"
 	play(text)
