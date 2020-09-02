@@ -37,7 +37,7 @@ def say_as_get_param():
 @app.route('/text/<the_text>')
 def say_as_path_variable(the_text):
   text = the_text or "привет"
-  play(text)
+  play(text, None)
   return text
 
 
@@ -50,6 +50,7 @@ def play(text, voice):
   url = RHVOICE_API_URL + "/say?text=" + text
   url = url + "&voice=" + voice if voice is not None else url
 
+  print(f'Playing url: {url}')
   player = vlc.MediaPlayer(url)
   player.play()
 
