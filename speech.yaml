@@ -19,7 +19,7 @@ services:
     ports:
       - 5000:5000
     environment:
-      RHVOICE_API_URL: rhvoice_rest_simple:8000
+      RHVOICE_API_URL: http://rhvoice_rest_simple:8000
     devices:
       - /dev/snd
     depends_on: ["rhvoice_rest"]
