@@ -14,8 +14,8 @@ RUN git clone https://github.com/vantu5z/RHVoice-dictionary.git /opt/RHVoice-dic
     cp /opt/RHVoice-dictionary/*.txt /usr/local/etc/RHVoice/dicts/Russian/ && \
     cp -R /opt/RHVoice-dictionary/tools /opt/
 # Cleanup
-#RUN cd /opt && rm -rf /opt/RHVoice && \
-#    apt-get purge -y build-essential scons pkg-config binutils bzip2 cpp cpp-5 dpkg-dev g++ g++-5 gcc gcc-5 libdpkg-perl libgcc-5-dev libstdc++-5-dev make uuid-dev
+RUN cd /opt && rm -rf /opt/RHVoice && \
+    apt-get purge -y build-essential scons pkg-config binutils bzip2 cpp cpp-5 dpkg-dev g++ g++-5 gcc gcc-5 libdpkg-perl libgcc-5-dev libstdc++-5-dev make uuid-dev
 
 ENV LC_ALL ru_RU.UTF-8
 ENV LANG ru_RU.UTF-8
