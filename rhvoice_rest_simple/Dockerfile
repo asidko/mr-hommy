@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:18.04
 # Install libs
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Moscow
