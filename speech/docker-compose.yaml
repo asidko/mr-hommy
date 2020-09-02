@@ -28,7 +28,7 @@ services:
   # Important! To hear the sound, connect your device to speakers or headphones.
   speaker:
     container_name: assistant_speaker
-    build: ./speaker
+    build: speaker
     ports:
       - 8050:8080
     environment:
