@@ -1,0 +1,7 @@
+version: "3.6"
+
+services:
+  config_provider:
+    container_name: config_provider
+    build: config_provider
+
