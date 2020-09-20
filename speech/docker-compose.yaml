@@ -16,10 +16,10 @@ services:
   # Voice produce service - generates wav/mp3 files
   # Example: http://localhost:7050/say?text=крутая+озвучка&voice=anna
   rhvoice_rest:
-    container_name: assistant_rhvoice_rest
+    container_name: hommy_rhvoice_rest
     build: ./rhvoice_rest_simple
     ports:
-      - 7050:80
+      - 7050:8080
     environment:
       DEFAULT_VOICE: aleksandr
 
@@ -27,12 +27,13 @@ services:
   # Example: http://localhost:8050/say?text=класна+озвучка&voice=anatol
   # Important! To hear the sound, connect your device to speakers or headphones.
   speaker:
-    container_name: assistant_speaker
+    container_name: hommy_speaker
     build: speaker
     ports:
       - 8050:8080
     environment:
-      RHVOICE_API_URL: http://rhvoice_rest
+      RHVOICE_API_URL: http://rhvoice_rest:8080
+      CONFIG_API_URL: http://hommy_config_provider:8080
     devices:
       - /dev/snd
     depends_on:

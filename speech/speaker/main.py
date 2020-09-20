@@ -1,59 +1,55 @@
-from flask import Flask
-from flask import request
 import os
 import sys
-from urllib.request import quote
+from flask import Flask
+from flask import request
 from os import environ
+from urllib.request import quote
+import requests
+import json
 
 # Fix for Windows to find VLC folder
 if sys.platform.startswith('win'):
-  os.environ['PYTHON_VLC_MODULE_PATH'] = """C:\Program Files\VideoLan"""
-  os.environ[
-    'PYTHON_VLC_LIB_PATH'] = """C:\Program Files\VideoLan\VLC\libvlc.dll"""
-  import vlc
+    os.environ['PYTHON_VLC_MODULE_PATH'] = """C:\Program Files\VideoLan"""
+    os.environ['PYTHON_VLC_LIB_PATH'] = """C:\Program Files\VideoLan\VLC\libvlc.dll"""
+    import vlc
 
-  vlc.Instance()
+    vlc.Instance()
 else:
-  import vlc
+    import vlc
 
-app = Flask(__name__)
-
+APP_NAME = 'speaker'
 RHVOICE_API_URL = environ.get('RHVOICE_API_URL') or 'http://localhost:8000'
+CONFIG_API_URL = environ.get('CONFIG_API_URL') or 'http://localhost:8010'
 
+config_default = {
+    'voice': 'aleksandr',
+    'default_text': 'привет'
+}
+config_request = requests.post(f'{CONFIG_API_URL}/config/init/{APP_NAME}', json=config_default)
 
-###################################
-# REST endpoints
-###################################
+config = json.loads(config_request.text)
+
+app = Flask(APP_NAME)
+
 
 @app.route('/say')
 @app.route('/')
 def say_as_get_param():
-  text = request.args.get('text') or "привет"
-  voice = request.args.get('voice')
-  play(text, voice)
-  return text
+    text = request.args.get('text') or config['default_text']
+    voice = request.args.get('voice') or config['voice']
+    play(text, voice)
+    return text
 
-
-@app.route('/text/<the_text>')
-def say_as_path_variable(the_text):
-  text = the_text or "привет"
-  play(text, None)
-  return text
-
-
-###################################
-# Functions
-###################################
 
 def play(text, voice):
-  text = quote(text)
-  url = RHVOICE_API_URL + "/say?text=" + text
-  url = url + "&voice=" + voice if voice is not None else url
+    text = quote(text)
+    url = RHVOICE_API_URL + "/say?text=" + text
+    url = url + "&voice=" + voice if voice is not None else url
 
-  print(f'Playing url: {url}')
-  player = vlc.MediaPlayer(url)
-  player.play()
+    print(f'Playing url: {url}')
+    player = vlc.MediaPlayer(url)
+    player.play()
 
 
 if __name__ == '__main__':
-  app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080)
