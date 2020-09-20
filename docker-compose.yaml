@@ -2,6 +2,21 @@ version: "3.6"
 
 services:
   config_provider:
-    container_name: config_provider
+    container_name: hommy_config_provider
     build: config_provider
+    ports:
+      - 8010:8080
+    environment:
+      DB_HOST: couchdb
+      DB_USER: admin
+      DB_PASSWORD: admin
 
+
+  couchdb:
+    container_name: hommy_couchdb
+    image: couchdb
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: admin
+    ports:
+      - 5984:5984

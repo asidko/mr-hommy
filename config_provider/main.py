@@ -1,33 +1,34 @@
 from os import environ
+import couchdb
+from flask import Flask, request
+
+# Configuration #############################
+DB_HOST = environ.get('DB_HOST') or 'localhost'
+DB_USER = environ.get('DB_USER') or 'admin'
+DB_PASSWORD = environ.get('DB_PASSWORD') or 'admin'
+DB_URL = f"http://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5984/"
+
+# Initialization ############################
+app = Flask(__name__)
+
+print('Connecting to: ' + DB_URL)
+server = couchdb.Server(DB_URL)
+db = server['app_configs']
 
 
-RHVOICE_API_URL = environ.get('RHVOICE_API_URL') or 'http://localhost:8000'
+@app.route('/config/init/<app_name>', methods=['POST'])
+def create_app_configuration(app_name: str):
+    new_app_config = request.get_json(force=True)
 
+    config_doc = {
+        '_id': app_name,
+        'app_name': app_name,
+        'config': new_app_config
+    }
+    db.update([config_doc])
 
-###################################
-# REST endpoints
-###################################
-
-@app.route('/config/init/<app_name>')
-def say_as_path_variable(the_text):
-  text = the_text or "привет"
-  play(text, None)
-  return text
-
-
-###################################
-# Functions
-###################################
-
-def play(text, voice):
-  text = quote(text)
-  url = RHVOICE_API_URL + "/say?text=" + text
-  url = url + "&voice=" + voice if voice is not None else url
-
-  print(f'Playing url: {url}')
-  player = vlc.MediaPlayer(url)
-  player.play()
+    return config_doc['config']
 
 
 if __name__ == '__main__':
-  app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080)
