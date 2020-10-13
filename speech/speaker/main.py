@@ -26,7 +26,6 @@ config_default = {
     'default_text': 'привет'
 }
 config_request = requests.post(f'{CONFIG_API_URL}/config/init/{APP_NAME}', json=config_default)
-
 config = json.loads(config_request.text)
 
 app = Flask(APP_NAME)
