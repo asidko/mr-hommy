@@ -9,7 +9,7 @@ import requests
 import json
 
 # Fix for Windows to find VLC folder
-from model import Configuration
+from model import Configuration, config_default
 
 if sys.platform.startswith('win'):
     os.environ['PYTHON_VLC_MODULE_PATH'] = """C:\Program Files\VideoLan"""
@@ -24,14 +24,6 @@ APP_NAME = 'speaker'
 RHVOICE_API_URL = environ.get('RHVOICE_API_URL') or 'http://localhost:8000'
 CONFIG_API_URL = environ.get('CONFIG_API_URL') or 'http://localhost:8010'
 
-config_default: Configuration = {
-    'default_voice_name': 'aleksandr',
-    'voices': {
-        'en': 'alan',
-        'ru': 'aleksandr',
-        'uk': 'anatol'
-    }
-}
 config_request = requests.post(f'{CONFIG_API_URL}/config/init/{APP_NAME}', json=config_default)
 config: Configuration = json.loads(config_request.text)
 
@@ -43,7 +35,7 @@ app = Flask(APP_NAME)
 def say_as_get_param():
     text = request.args.get('text') or ''
     if not text:
-        return 'no text given'
+        return 'No text given. Pass parameters like ?text=Hello&voice=en'
 
     lang = request.args.get('lang') or 'ru'
     voice = request.args.get('voice') \
