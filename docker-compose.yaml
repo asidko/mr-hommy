@@ -1,6 +1,59 @@
 version: "3.6"
 
+global_env: &global_env
+  SPEAKER_API_URL: http://speaker
+  CONFIG_API_URL: http://config_provider
+
 services:
+
+  #######################################################
+  ##    Voice
+  #######################################################
+
+  # RHVoice names list:
+  #   spomenka|                   # Esperanto
+  #   natia|                      # Georgian
+  #   azamat|nazgul|              # Kyrgyz
+  #   talgat|                     # Tatar
+  #   alan|bdl|clb|slt|           # English
+  #   aleksandr|anna|elena|irina| # Russian
+  #   anatol|natalia              # Ukrainian
+
+
+  # Core voice produce service - generates wav/mp3 files
+  # Example: http://localhost:7050/say?text=крутая+озвучка&voice=anna
+  rhvoice_rest:
+    container_name: hommy_rhvoice_rest
+    build: ./rhvoice_rest_simple
+    ports:
+      - 7050:8080
+    environment:
+      DEFAULT_VOICE: aleksandr
+
+  # Speaker service - play sound by url using VLC player
+  # Example: http://localhost:8050/say?text=класна+озвучка&lang=uk
+  # Supported languages: uk, ru, en
+  # Important! To hear the sound, connect your device to speakers or headphones.
+  speaker:
+    container_name: hommy_speaker
+    build: speaker
+    ports:
+      - 8050:8080
+    environment:
+      RHVOICE_API_URL: http://rhvoice_rest:8080
+      CONFIG_API_URL: http://hommy_config_provider:8080
+    devices:
+      - /dev/snd
+    depends_on:
+      - rhvoice_rest
+
+  #######################################################
+  ##    Core services
+  #######################################################
+
+  # Store and provide configuration for all applications
+  # Example:
+  #  - store default configs or get existing: POST http://localhost:8010/config/init/MY_APP_NAME  <json config in payload>
   config_provider:
     container_name: hommy_config_provider
     build: config_provider
@@ -11,7 +64,7 @@ services:
       DB_USER: admin
       DB_PASSWORD: admin
 
-
+  # CouchDB database to store configurations
   couchdb:
     container_name: hommy_couchdb
     image: couchdb
@@ -20,3 +73,18 @@ services:
       COUCHDB_PASSWORD: admin
     ports:
       - 5984:5984
+
+  #######################################################
+  ##    Applications
+  #######################################################
+
+  # Alarm clock. Speaks phrases at the specified time.
+  app_time_notify:
+    container_name: : hommy_app_time_notify
+    build: app-time-notify
+    ports:
+      - 8050:8080
+    environment:
+      <<: *global_env
+    depends_on:
+      - rhvoice_rest
