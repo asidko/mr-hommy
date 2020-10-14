@@ -1,9 +1,5 @@
 version: "3.6"
 
-global_env: &global_env
-  SPEAKER_API_URL: http://speaker
-  CONFIG_API_URL: http://config_provider
-
 services:
 
   #######################################################
@@ -24,7 +20,7 @@ services:
   # Example: http://localhost:7050/say?text=крутая+озвучка&voice=anna
   rhvoice_rest:
     container_name: hommy_rhvoice_rest
-    build: ./rhvoice_rest_simple
+    build: speech/rhvoice_rest_simple
     ports:
       - 7050:8080
     environment:
@@ -36,7 +32,7 @@ services:
   # Important! To hear the sound, connect your device to speakers or headphones.
   speaker:
     container_name: hommy_speaker
-    build: speaker
+    build: speech/speaker
     ports:
       - 8050:8080
     environment:
@@ -80,11 +76,12 @@ services:
 
   # Alarm clock. Speaks phrases at the specified time.
   app_time_notify:
-    container_name: : hommy_app_time_notify
-    build: app-time-notify
+    container_name: hommy_app_time_notify
+    build: app_time_notify
     ports:
       - 8050:8080
     environment:
-      <<: *global_env
+      SPEAKER_API_URL: http://speaker
+      CONFIG_API_URL: http://config_provider
     depends_on:
       - rhvoice_rest
