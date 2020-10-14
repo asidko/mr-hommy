@@ -1,4 +1,5 @@
 import os
+
 import sys
 from flask import Flask
 from flask import request
@@ -8,6 +9,8 @@ import requests
 import json
 
 # Fix for Windows to find VLC folder
+from model import Configuration
+
 if sys.platform.startswith('win'):
     os.environ['PYTHON_VLC_MODULE_PATH'] = """C:\Program Files\VideoLan"""
     os.environ['PYTHON_VLC_LIB_PATH'] = """C:\Program Files\VideoLan\VLC\libvlc.dll"""
@@ -21,12 +24,16 @@ APP_NAME = 'speaker'
 RHVOICE_API_URL = environ.get('RHVOICE_API_URL') or 'http://localhost:8000'
 CONFIG_API_URL = environ.get('CONFIG_API_URL') or 'http://localhost:8010'
 
-config_default = {
-    'voice': 'aleksandr',
-    'default_text': 'привет'
+config_default: Configuration = {
+    'default_voice_name': 'aleksandr',
+    'voices': {
+        'en': 'alan',
+        'ru': 'aleksandr',
+        'uk': 'anatol'
+    }
 }
 config_request = requests.post(f'{CONFIG_API_URL}/config/init/{APP_NAME}', json=config_default)
-config = json.loads(config_request.text)
+config: Configuration = json.loads(config_request.text)
 
 app = Flask(APP_NAME)
 
@@ -34,9 +41,17 @@ app = Flask(APP_NAME)
 @app.route('/say')
 @app.route('/')
 def say_as_get_param():
-    text = request.args.get('text') or config['default_text']
-    voice = request.args.get('voice') or config['voice']
+    text = request.args.get('text') or ''
+    if not text:
+        return 'no text given'
+
+    lang = request.args.get('lang') or 'ru'
+    voice = request.args.get('voice') \
+            or config['voices'][lang] \
+            or config['default_voice_name']
+
     play(text, voice)
+
     return text
 
 
