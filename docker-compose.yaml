@@ -51,6 +51,8 @@ services:
     environment:
       COUCHDB_USER: admin
       COUCHDB_PASSWORD: admin
+    volumes:
+      - couchdb_data:/opt/couchdb/data
     ports:
       - 5984:5984
 
@@ -83,3 +85,6 @@ services:
     depends_on:
       - config_provider
       - speaker
+
+volumes:
+  couchdb_data:
