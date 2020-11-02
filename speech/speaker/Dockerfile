@@ -1,7 +1,7 @@
-FROM python:3.7-stretch
+FROM python:3.8.6-slim-buster
 
 RUN apt-get update \ 
-	&& apt-get install -y vlc-nox
+	&& apt-get install -y vlc-bin vlc-data vlc-plugin-base
 WORKDIR /app
 
 COPY ./requirements.txt .

@@ -12,7 +12,8 @@ DB_URL = f"http://{DB_HOST}:5984/"
 app = Flask(__name__)
 
 print('Connecting to: ' + DB_URL)
-server = couchdb2.Server(DB_URL, DB_USER, DB_PASSWORD)
+server = couchdb2.Server(href=DB_URL, username=DB_USER, password=DB_PASSWORD,
+                use_session=False, ca_file=None)
 
 if 'app_configs' in server:
     db = server['app_configs']
@@ -22,13 +23,16 @@ else:
 
 @app.route('/config/init/<app_name>', methods=['POST'])
 def create_app_configuration(app_name: str):
+    print('Got init request from app: %s' % app_name)
     new_app_config = request.get_json(force=True)
-
+    
     config_doc = {
         '_id': app_name,
         'app_name': app_name,
         'config': new_app_config
     }
+    
+    print('Updating config:', config_doc)
     db.update([config_doc])
 
     return config_doc['config']

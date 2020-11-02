@@ -13,7 +13,10 @@ APP_NAME = 'app-time-notify'
 CONFIG_API_URL = environ.get('CONFIG_API_URL') or 'http://localhost:8010'
 SPEAKER_API_URL = environ.get('SPEAKER_API_URL') or 'http://localhost:8050'
 
+print('Request configs')
 config_request = requests.post(f'{CONFIG_API_URL}/config/init/{APP_NAME}', json=config_default)
+
+print('Loading configs', config_request.json())
 config: Configuration = json.loads(config_request.text)
 
 

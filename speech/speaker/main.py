@@ -15,16 +15,19 @@ if sys.platform.startswith('win'):
     os.environ['PYTHON_VLC_MODULE_PATH'] = """C:\Program Files\VideoLan"""
     os.environ['PYTHON_VLC_LIB_PATH'] = """C:\Program Files\VideoLan\VLC\libvlc.dll"""
     import vlc
-
-    vlc.Instance()
 else:
     import vlc
 
+vlc.Instance()
+    
 APP_NAME = 'speaker'
 RHVOICE_API_URL = environ.get('RHVOICE_API_URL') or 'http://localhost:8000'
 CONFIG_API_URL = environ.get('CONFIG_API_URL') or 'http://localhost:8010'
 
+print('Request configs')
 config_request = requests.post(f'{CONFIG_API_URL}/config/init/{APP_NAME}', json=config_default)
+
+print('Loading configs', config_request.json())
 config: Configuration = json.loads(config_request.text)
 
 app = Flask(APP_NAME)

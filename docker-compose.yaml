@@ -47,7 +47,7 @@ services:
 
   # CouchDB database to store configurations
   couchdb:
-    image: couchdb:3.1.1
+    image: couchdb:3.1
     environment:
       COUCHDB_USER: admin
       COUCHDB_PASSWORD: admin
@@ -77,14 +77,12 @@ services:
   # Alarm clock. Speaks phrases at the specified time.
   app_time_notify:
     build: app_time_notify
-    ports:
-      - 8050:8080
     environment:
-      SPEAKER_API_URL: http://speaker
-      CONFIG_API_URL: http://config_provider
+      SPEAKER_API_URL: http://speaker:8080
+      CONFIG_API_URL: http://config_provider:8080
     depends_on:
       - config_provider
-      - speaker
+
 
 volumes:
   couchdb_data:
