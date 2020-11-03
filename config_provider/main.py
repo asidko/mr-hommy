@@ -26,6 +26,9 @@ def create_app_configuration(app_name: str):
     print('Got init request from app: %s' % app_name)
     new_app_config = request.get_json(force=True)
     
+    if app_name in db:
+      return db[app_name]['config'] or {}
+      
     config_doc = {
         '_id': app_name,
         'app_name': app_name,

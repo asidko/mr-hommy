@@ -5,8 +5,9 @@ from os import environ
 
 import requests
 import schedule
-import time
+from time import sleep
 
+from datetime import datetime
 from model import Notification, Configuration, config_default
 
 APP_NAME = 'app-time-notify'
@@ -22,9 +23,9 @@ config: Configuration = json.loads(config_request.text)
 
 def speak(text: str, lang: str):
     print(f"Speaking text: '{text}' on lang='{lang}'")
-    url_params = urllib.parse.urlencode({text: text, lang: lang})
+    url_params = urllib.parse.urlencode({'text': text, 'lang': lang})
     try:
-        requests.post(f'{SPEAKER_API_URL}?{url_params}')
+        requests.get(f'{SPEAKER_API_URL}/say?{url_params}')
     except IOError:
         print('Error sending speaking request.')
 
@@ -40,11 +41,15 @@ def say_notification_job(notification: Notification):
 if __name__ == '__main__':
     # Init schedules
     for notification in config['notifications']:
-        print("Plan schedule at: %s" % notification['time'])
-        schedule.every().day.at(notification['time']).do(say_notification_job, notification)
+        print("Planing schedule at: %s" % notification['time'])
+        try:
+          time = datetime.strptime(notification['time'], '%H:%M');
+          schedule.every().day.at(time.strftime('%H:%M')).do(say_notification_job, notification)
+        except Exception as e:
+           print("Error scheduling for time: {}. Details: {}".format(notification['time'], e))    
 
     # Start
     print("Run schedules...")
     while True:
         schedule.run_pending()
-        time.sleep(1)
+        sleep(1)
