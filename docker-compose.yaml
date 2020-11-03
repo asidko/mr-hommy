@@ -6,18 +6,12 @@ services:
   ##    Voice
   #######################################################
 
-  # RHVoice names list:
-  #   spomenka|                   # Esperanto
-  #   natia|                      # Georgian
-  #   azamat|nazgul|              # Kyrgyz
-  #   talgat|                     # Tatar
-  #   alan|bdl|clb|slt|           # English
-  #   aleksandr|anna|elena|irina| # Russian
-  #   anatol|natalia              # Ukrainian
-
-
-  # Core voice produce service - generates wav/mp3 files
+  # Voice produce service - generates wav/mp3 file with voiced phrases.
   # Example: http://localhost:7050/say?text=крутая+озвучка&voice=anna
+  # RHVoice available voice names:
+  # alan            # English
+  # aleksandr|anna  # Russian
+  # anatol|natalia  # Ukrainian
   rhvoice_rest:
     build: speech/rhvoice_rest_simple
     ports:
@@ -25,10 +19,12 @@ services:
     environment:
       DEFAULT_VOICE: aleksandr
 
-  # Speaker service - play sound by url using VLC player
+  # Speaker service - plays sounds (using VLC player).
+  # It sends request to voice produce service and plays received wav/mp3 file.
   # Example: http://localhost:8050/say?text=класна+озвучка&lang=uk
   # Supported languages: uk, ru, en
   # Important! To hear the sound, connect your device to speakers or headphones.
+  # In Windows or MacOS you could run this service manually without Docker: pip install -r requirements.txt && python main.py
   speaker:
     build: speech/speaker
     ports:
@@ -37,6 +33,7 @@ services:
       RHVOICE_API_URL: http://rhvoice_rest:8080
       CONFIG_API_URL: http://config_provider:8080
     devices:
+      # This service uses sound device in Linux, so it won't run in Windows or MacOS.
       - /dev/snd
     depends_on:
       - rhvoice_rest
@@ -45,7 +42,8 @@ services:
   ##    Core services
   #######################################################
 
-  # CouchDB database to store configurations
+  # CouchDB database.
+  # Stores other services configurations.
   couchdb:
     image: couchdb:3.1
     environment:
@@ -75,6 +73,7 @@ services:
   #######################################################
 
   # Alarm clock. Speaks phrases at the specified time.
+  # It's a default example application to demonstrate how the entire system works
   app_time_notify:
     build: app_time_notify
     environment:
