@@ -28,6 +28,7 @@ ENV LC_ALL ru_RU.UTF-8
 ENV LANG ru_RU.UTF-8
 ENV LANGUAGE ru_RU.UTF-8
 
+RUN mkdir -p /opt/data
 ADD app.py /opt/app.py
 
 EXPOSE 8080/tcp
