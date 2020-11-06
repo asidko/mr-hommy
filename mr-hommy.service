@@ -9,15 +9,14 @@ Requires=docker.service
 After=docker.service
 
 [Service]
-Restart=always
-RestartSec=10
-TimeoutSec=30
+Type=oneshot
+RemainAfterExit=yes
 # Assume, this project located in "/opt/mr-hommy"
 # If not, fix to the correct path
 WorkingDirectory=/opt/mr-hommy
-ExecStart=/usr/bin/docker-compose -f /opt/mr-hommy/docker-compose.yaml --project-directory /opt/mr-hommy up -d
-ExecStop =/usr/bin/docker-compose -f /opt/mr-hommy/docker-compose.yaml --project-directory /opt/mr-hommy stop
-
+ExecStart=/usr/local/bin/docker-compose up -d
+ExecStop=/usr/local/bin/docker-compose down
+TimeoutStartSec=0
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
