@@ -15,8 +15,9 @@ RestartSec=10
 # Assume, this project located in "/opt/mr-hommy"
 # If not, fix to the correct path
 WorkingDirectory=/opt/mr-hommy
-ExecStart=/usr/bin/docker-compose -f /opt/mr-hommy/docker-compose.yaml --project-directory /opt/mr-hommy up
+ExecStart=/usr/bin/docker-compose -f /opt/mr-hommy/docker-compose.yaml --project-directory /opt/mr-hommy up -d
 ExecStop =/usr/bin/docker-compose -f /opt/mr-hommy/docker-compose.yaml --project-directory /opt/mr-hommy stop
+
 
 [Install]
 WantedBy=default.target
