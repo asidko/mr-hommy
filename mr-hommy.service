@@ -9,9 +9,9 @@ Requires=docker.service
 After=docker.service
 
 [Service]
-Type=notify
 Restart=always
 RestartSec=10
+TimeoutSec=30
 # Assume, this project located in "/opt/mr-hommy"
 # If not, fix to the correct path
 WorkingDirectory=/opt/mr-hommy
