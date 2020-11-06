@@ -12,6 +12,7 @@ After=docker.service
 Restart=always
 # Assume, this project located in "/opt/mr-hommy"
 # If not, fix to the correct path
+WorkingDirectory=/opt/mr-hommy
 ExecStart=/usr/bin/docker-compose -f /opt/mr-hommy/docker-compose.yml --project-directory /opt/mr-hommy up
 ExecStop =/usr/bin/docker-compose -f /opt/mr-hommy/docker-compose.yml --project-directory /opt/mr-hommy stop
 
