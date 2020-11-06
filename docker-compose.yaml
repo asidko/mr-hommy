@@ -65,7 +65,7 @@ services:
       DB_USER: admin
       DB_PASSWORD: admin
     volumes:
-      ./wait-for-it.sh:/usr/local/bin/wait-for-it.sh
+      - ./wait-for-it.sh:/usr/local/bin/wait-for-it.sh
     command: ["./wait-for-it.sh", "couchdb:5984", "--", "python", "./main.py" ]
     depends_on:
       - couchdb
