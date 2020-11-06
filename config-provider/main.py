@@ -1,4 +1,5 @@
 from os import environ
+
 import couchdb2
 from flask import Flask, request
 

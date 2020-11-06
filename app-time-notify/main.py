@@ -1,13 +1,13 @@
 import json
 import random
 import urllib
+from datetime import datetime
 from os import environ
 
 import requests
 import schedule
 from time import sleep
 
-from datetime import datetime
 from model import Notification, Configuration, config_default
 
 APP_NAME = 'app-time-notify'

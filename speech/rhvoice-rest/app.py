@@ -1,11 +1,15 @@
+import hashlib
+import os
+import re
+import subprocess
+import urllib
 from flask import Flask, request, send_from_directory, after_this_request
-import subprocess, os, urllib, hashlib, re
 from shlex import quote
 
 app = Flask(__name__, static_url_path='')
 data_path = "/opt/data"
 
-DEFAULT_VOICE = os.environ.get('DEFAULT_VOICE') or 'anna'
+DEFAULT_VOICE = os.environ.get('DEFAULT_VOICE') or 'aleksandr'
 
 @app.route('/say')
 def say():

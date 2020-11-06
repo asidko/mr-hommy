@@ -12,12 +12,10 @@ services:
   # alan            # English
   # aleksandr|anna  # Russian
   # anatol|natalia  # Ukrainian
-  rhvoice_rest:
-    build: speech/rhvoice_rest
+  rhvoice-rest:
+    build: speech/rhvoice-rest
     ports:
       - 7050:8080
-    environment:
-      DEFAULT_VOICE: aleksandr
 
   # Speaker service - plays sounds (using VLC player).
   # It sends request to voice produce service and plays received wav/mp3 file.
@@ -30,13 +28,14 @@ services:
     ports:
       - 8050:8080
     environment:
-      RHVOICE_API_URL: http://rhvoice_rest:8080
-      CONFIG_API_URL: http://config_provider:8080
+      RHVOICE_API_URL: http://rhvoice-rest:8080
+      CONFIG_API_URL: http://config-provider:8080
     devices:
       # This service uses sound device in Linux, so it won't run in Windows or MacOS.
       - /dev/snd
     depends_on:
-      - rhvoice_rest
+      - rhvoice-rest
+      - config-provider
 
   #######################################################
   ##    Core services
@@ -57,8 +56,8 @@ services:
   # Store and provide configuration for all applications
   # Example:
   #  - store default configs or get existing: POST http://localhost:8010/config/init/MY_APP_NAME  <json config in payload>
-  config_provider:
-    build: config_provider
+  config-provider:
+    build: config-provider
     ports:
       - 8010:8080
     environment:
@@ -74,13 +73,13 @@ services:
 
   # Alarm clock. Speaks phrases at the specified time.
   # It's a default example application to demonstrate how the entire system works
-  app_time_notify:
-    build: app_time_notify
+  app-time-notify:
+    build: app-time-notify
     environment:
       SPEAKER_API_URL: http://speaker:8080
-      CONFIG_API_URL: http://config_provider:8080
+      CONFIG_API_URL: http://config-provider:8080
     depends_on:
-      - config_provider
+      - config-provider
 
 
 volumes:
