@@ -13,7 +13,7 @@ services:
   # aleksandr|anna  # Russian
   # anatol|natalia  # Ukrainian
   rhvoice_rest:
-    build: speech/rhvoice_rest_simple
+    build: speech/rhvoice_rest
     ports:
       - 7050:8080
     environment:
