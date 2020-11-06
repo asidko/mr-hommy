@@ -1,0 +1,19 @@
+# Copy this service to systemd to run mr-hommy as service:
+#   sudo cp ./mr-hommy.service /etc/systemd/system/mr-hommy.service
+# Then enable it for autostart:
+#   sudo systemctl enable mr-hommy.service
+
+[Unit]
+Description=MrHommy assistant
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+# Assume, this project located in "/opt/mr-hommy"
+# If not, fix to the correct path
+ExecStart=/usr/bin/docker-compose -f /opt/mr-hommy/docker-compose.yml --project-directory /opt/mr-hommy up
+ExecStop =/usr/bin/docker-compose -f /opt/mr-hommy/docker-compose.yml --project-directory /opt/mr-hommy stop
+
+[Install]
+WantedBy=default.target
