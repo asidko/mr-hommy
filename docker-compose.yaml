@@ -16,6 +16,7 @@ services:
     build: speech/rhvoice-rest
     ports:
       - 7050:8080
+    restart: on-failure
 
   # Speaker service - plays sounds (using VLC player).
   # It sends request to voice produce service and plays received wav/mp3 file.
@@ -36,6 +37,7 @@ services:
     depends_on:
       - rhvoice-rest
       - config-provider
+    restart: on-failure
 
   #######################################################
   ##    Core services
@@ -52,6 +54,7 @@ services:
       - couchdb_data:/opt/couchdb/data
     ports:
       - 5984:5984
+    restart: on-failure
 
   # Store and provide configuration for all applications
   # Example:
@@ -69,6 +72,7 @@ services:
     command: ["/app/wait-for-it.sh", "couchdb:5984", "--", "python", "./main.py" ]
     depends_on:
       - couchdb
+    restart: on-failure
 
   #######################################################
   ##    Applications
@@ -83,7 +87,7 @@ services:
       CONFIG_API_URL: http://config-provider:8080
     depends_on:
       - config-provider
-
+    restart: on-failure
 
 volumes:
   couchdb_data:
