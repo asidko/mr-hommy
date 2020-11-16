@@ -18,6 +18,11 @@ services:
       - 7050:8080
     restart: on-failure
 
+  # Voice listener service - send audio from microphone to recognition service
+  listener:
+    build: speech/listener
+    restart: on-failure
+
   # Speaker service - plays sounds (using VLC player).
   # It sends request to voice produce service and plays received wav/mp3 file.
   # Example: http://localhost:8050/say?text=класна+озвучка&lang=uk
