@@ -18,9 +18,28 @@ services:
       - 7050:8080
     restart: on-failure
 
+  # Voice recognition service - converts given audio to text
+  vosk-api:
+    build:
+      context: speech/vosk-api
+      # Image build params
+      args:
+        # Models from: https://alphacephei.com/vosk/models
+        # Examples: vosk-model-small-ru-0.4 (~39Mb) | vosk-model-ru-0.10.zip (~2.5Gb)
+        MODEL_NAME: vosk-model-small-ru-0.4
+        # Vosk API release version from: https://github.com/alphacep/vosk-api/releases
+        VOSK_API_VERSION: 0.3.15
+    ports:
+      - 8086:8086
+
   # Voice listener service - send audio from microphone to recognition service
   listener:
     build: speech/listener
+    environment:
+      VOSK_API_URL: http://127.0.0.1:8086
+      MICROPHONE_DEVICE_INDEX: -1 # -1 for auto
+      SAMPLE_RATE: 16000
+      PHRASE_TIME_LIMIT_SEC: 10
     restart: on-failure
 
   # Speaker service - plays sounds (using VLC player).
@@ -50,6 +69,7 @@ services:
 
   # CouchDB database.
   # Stores other services configurations.
+  # UI address: http://localhost:5984/_utils
   couchdb:
     image: couchdb:3.1
     environment:
@@ -62,8 +82,8 @@ services:
     restart: on-failure
 
   # Store and provide configuration for all applications
-  # Example:
-  #  - store default configs or get existing: POST http://localhost:8010/config/init/MY_APP_NAME  <json config in payload>
+  # Example to store default configs or get existing:
+  # POST http://localhost:8010/config/init/MY_APP_NAME  BODY: {"my_prop1: "value1", "my_prop2": "value2"}
   config-provider:
     build: config-provider
     ports:
@@ -74,6 +94,7 @@ services:
       DB_PASSWORD: admin
     volumes:
       - ./wait-for-it.sh:/app/wait-for-it.sh
+    # Waiting for database start
     command: ["/app/wait-for-it.sh", "couchdb:5984", "--", "python", "./main.py" ]
     depends_on:
       - couchdb
