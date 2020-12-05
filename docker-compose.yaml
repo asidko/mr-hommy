@@ -38,9 +38,11 @@ services:
     build: speech/listener
     environment:
       VOSK_API_URL: http://vosk-api:8086
-      MICROPHONE_DEVICE_INDEX: 0
+      MICROPHONE_DEVICE_INDEX: 1
       SAMPLE_RATE: 16000
       PHRASE_TIME_LIMIT_SEC: 10
+    volumes:
+      - ./speech/listener/asoundrc.conf:/etc/asound.conf/asoundrc.conf:ro
     devices:
       # This service uses sound device in Linux, so it won't run in Windows or MacOS.
       - /dev/snd

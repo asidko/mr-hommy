@@ -10,6 +10,7 @@ SAMPLE_RATE = int(environ.get('SAMPLE_RATE')) or 16000
 PHRASE_TIME_LIMIT_SEC = environ.get('PHRASE_TIME_LIMIT_SEC') or 20
 
 SAMPLE_RATE = int(SAMPLE_RATE)
+PHRASE_TIME_LIMIT_SEC = float(PHRASE_TIME_LIMIT_SEC)
 
 def print_device_list():
     print("-------------\nGetting microphone devices...\n-------------")
@@ -64,7 +65,7 @@ def listener():
         print(' {}'.format(pretty_size(len(data))), end='\r', flush=True)
         text = stt(data, VOSK_API_URL)
 
-        print('Result: {}'.format(text))
+        print('Result: ' + text)
 
 
 if __name__ == '__main__':
