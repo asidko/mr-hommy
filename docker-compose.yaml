@@ -21,7 +21,8 @@ services:
   # Voice recognition service - converts given audio to text
   vosk-api:
     build:
-      context: speech/vosk-api
+      context: speech/vosk-api/
+      dockerfile: Dockerfile.arm64v8
       # Image build params
       args:
         # Models from: https://alphacephei.com/vosk/models
@@ -36,10 +37,13 @@ services:
   listener:
     build: speech/listener
     environment:
-      VOSK_API_URL: http://127.0.0.1:8086
-      MICROPHONE_DEVICE_INDEX: -1 # -1 for auto
+      VOSK_API_URL: http://vosk-api:8086
+      MICROPHONE_DEVICE_INDEX: 0
       SAMPLE_RATE: 16000
       PHRASE_TIME_LIMIT_SEC: 10
+    devices:
+      # This service uses sound device in Linux, so it won't run in Windows or MacOS.
+      - /dev/snd
     restart: on-failure
 
   # Speaker service - plays sounds (using VLC player).

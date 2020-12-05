@@ -1,11 +1,25 @@
 import json
 from speech_recognition import Microphone, Recognizer
 from urllib.request import Request, urlopen
+from os import environ
 
-VOSK_API_URL = 'http://127.0.0.1:8086'
-MICROPHONE_DEVICE_INDEX = -1
-SAMPLE_RATE = 16000
-PHRASE_TIME_LIMIT_SEC = 20
+VOSK_API_URL = environ.get('VOSK_API_URL') or 'http://127.0.0.1:8086'
+MICROPHONE_DEVICE_INDEX = int(environ.get('MICROPHONE_DEVICE_INDEX'))
+MICROPHONE_DEVICE_INDEX = MICROPHONE_DEVICE_INDEX if MICROPHONE_DEVICE_INDEX >= 0 else None
+SAMPLE_RATE = int(environ.get('SAMPLE_RATE')) or 16000
+PHRASE_TIME_LIMIT_SEC = environ.get('PHRASE_TIME_LIMIT_SEC') or 20
+
+SAMPLE_RATE = int(SAMPLE_RATE)
+
+def print_device_list():
+    print("-------------\nGetting microphone devices...\n-------------")
+    microphones = Microphone.list_microphone_names()
+
+    for index, name in enumerate(microphones):
+        print("----> Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
+    
+    print("-------------")
+
 
 def stt(data: bytes, url: str) -> str:
     request = Request('{}/stt'.format(url), data=data, headers={'Content-Type': 'audio/wav'})
@@ -31,12 +45,14 @@ def listener():
     r = None
     while True:
 
-        if r is not None:
-            print('Initialization')
+        print('Initialization')
+
+        if r is None:
+            print("Use device_index=%s and sample_rate=%s" % (MICROPHONE_DEVICE_INDEX, SAMPLE_RATE))
 
         r = Recognizer()
 
-        with Microphone(MICROPHONE_DEVICE_INDEX, sample_rate=SAMPLE_RATE) as source:
+        with Microphone(device_index=MICROPHONE_DEVICE_INDEX, sample_rate=SAMPLE_RATE) as source:
             print('Adjusting for noise')
             r.adjust_for_ambient_noise(source)
 
@@ -53,6 +69,7 @@ def listener():
 
 if __name__ == '__main__':
     try:
+        print_device_list()
         listener()
     except Exception as e:
         print('Error occured.')
