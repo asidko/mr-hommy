@@ -38,7 +38,6 @@ services:
     build: speech/listener
     environment:
       VOSK_API_URL: http://vosk-api:8086
-      MICROPHONE_DEVICE_INDEX: 1
       SAMPLE_RATE: 16000
       PHRASE_TIME_LIMIT_SEC: 10
     volumes:

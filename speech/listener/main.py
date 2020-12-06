@@ -1,25 +1,33 @@
 import json
-from speech_recognition import Microphone, Recognizer
-from urllib.request import Request, urlopen
 from os import environ
+from urllib.request import Request, urlopen
+
+from speech_recognition import Microphone, Recognizer
 
 VOSK_API_URL = environ.get('VOSK_API_URL') or 'http://127.0.0.1:8086'
-MICROPHONE_DEVICE_INDEX = int(environ.get('MICROPHONE_DEVICE_INDEX'))
-MICROPHONE_DEVICE_INDEX = MICROPHONE_DEVICE_INDEX if MICROPHONE_DEVICE_INDEX >= 0 else None
-SAMPLE_RATE = int(environ.get('SAMPLE_RATE')) or 16000
+SAMPLE_RATE = environ.get('SAMPLE_RATE') or 16000
 PHRASE_TIME_LIMIT_SEC = environ.get('PHRASE_TIME_LIMIT_SEC') or 20
 
 SAMPLE_RATE = int(SAMPLE_RATE)
 PHRASE_TIME_LIMIT_SEC = float(PHRASE_TIME_LIMIT_SEC)
 
+
 def print_device_list():
     print("-------------\nGetting microphone devices...\n-------------")
-    microphones = Microphone.list_microphone_names()
 
-    for index, name in enumerate(microphones):
+    for index, name in enumerate(Microphone.list_microphone_names()):
         print("----> Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
-    
+
     print("-------------")
+
+
+def get_mic_index():
+    mic_index = next((i for i, name in enumerate(Microphone.list_microphone_names()) if name == 'mic'), -1)
+
+    if mic_index < 0:
+        raise Exception('Device with name "mic" was not found. Check settings in asoundrc.conf file')
+
+    return mic_index
 
 
 def stt(data: bytes, url: str) -> str:
@@ -28,6 +36,7 @@ def stt(data: bytes, url: str) -> str:
 
     if not ('code' in result and 'text' in result):
         raise RuntimeError('Wrong reply from server: {}'.format(result))
+
     return result['text'] if not result['code'] else 'Server error: [{code}]: {text}'.format(**result)
 
 
@@ -44,16 +53,18 @@ def pretty_size(size) -> str:
 
 def listener():
     r = None
+    mic_device_index = get_mic_index()
+
     while True:
 
         print('Initialization')
 
         if r is None:
-            print("Use device_index=%s and sample_rate=%s" % (MICROPHONE_DEVICE_INDEX, SAMPLE_RATE))
+            print("Use device_index=%s and sample_rate=%s" % (mic_device_index, SAMPLE_RATE))
 
         r = Recognizer()
 
-        with Microphone(device_index=MICROPHONE_DEVICE_INDEX, sample_rate=SAMPLE_RATE) as source:
+        with Microphone(device_index=mic_device_index, sample_rate=SAMPLE_RATE) as source:
             print('Adjusting for noise')
             r.adjust_for_ambient_noise(source)
 
