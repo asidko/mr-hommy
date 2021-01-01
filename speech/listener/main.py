@@ -7,6 +7,7 @@ from speech_recognition import Microphone, Recognizer
 VOSK_API_URL = environ.get('VOSK_API_URL') or 'http://127.0.0.1:8086'
 SAMPLE_RATE = environ.get('SAMPLE_RATE') or 16000
 PHRASE_TIME_LIMIT_SEC = environ.get('PHRASE_TIME_LIMIT_SEC') or 20
+MICROPHONE_NAME_FROM_CONFIG = 'mic'
 
 SAMPLE_RATE = int(SAMPLE_RATE)
 PHRASE_TIME_LIMIT_SEC = float(PHRASE_TIME_LIMIT_SEC)
@@ -22,12 +23,18 @@ def print_device_list():
 
 
 def get_mic_index():
-    mic_index = next((i for i, name in enumerate(Microphone.list_microphone_names()) if name == 'mic'), -1)
+    mic_list = Microphone.list_microphone_names()
+    mic_index = next((i for i, name in enumerate(mic_list) if name == MICROPHONE_NAME_FROM_CONFIG), -1)
+
+    if mic_index >= 0:
+        return mic_index
 
     if mic_index < 0:
-        raise Exception('Device with name "mic" was not found. Check settings in asoundrc.conf file')
+        print(f'Device with name "{MICROPHONE_NAME_FROM_CONFIG}" was not found. Check settings in asoundrc.conf file')
 
-    return mic_index
+    print('Try to use first device as microphone. Device name: ' + mic_list[0])
+
+    return 0
 
 
 def stt(data: bytes, url: str) -> str:
