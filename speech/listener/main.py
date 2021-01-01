@@ -7,8 +7,7 @@ from speech_recognition import Microphone, Recognizer
 VOSK_API_URL = environ.get('VOSK_API_URL') or 'http://127.0.0.1:8086'
 SAMPLE_RATE = environ.get('SAMPLE_RATE') or 16000
 PHRASE_TIME_LIMIT_SEC = environ.get('PHRASE_TIME_LIMIT_SEC') or 20
-MICROPHONE_NAME_FROM_CONFIG = 'mic'
-
+ALSA_MICROPHONE_NAME = environ.get('ALSA_MICROPHONE_NAME') or 'mic'
 SAMPLE_RATE = int(SAMPLE_RATE)
 PHRASE_TIME_LIMIT_SEC = float(PHRASE_TIME_LIMIT_SEC)
 
@@ -17,27 +16,27 @@ def print_device_list():
     print("-------------\nGetting microphone devices...\n-------------")
 
     for index, name in enumerate(Microphone.list_microphone_names()):
-        print("----> Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
+        print("-> Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
 
     print("-------------")
 
 
 def get_mic_index():
     mic_list = Microphone.list_microphone_names()
-    mic_index = next((i for i, name in enumerate(mic_list) if name == MICROPHONE_NAME_FROM_CONFIG), -1)
+    mic_index = next((i for i, name in enumerate(mic_list) if name == ALSA_MICROPHONE_NAME), -1)
 
     if mic_index >= 0:
         return mic_index
 
     if mic_index < 0:
-        print(f'Device with name "{MICROPHONE_NAME_FROM_CONFIG}" was not found. Check settings in asoundrc.conf file')
+        print(f'Device with name "{ALSA_MICROPHONE_NAME}" was not found. Check settings in asoundrc.conf file')
 
     print('Try to use first device as microphone. Device name: ' + mic_list[0])
 
     return 0
 
 
-def stt(data: bytes, url: str) -> str:
+def sound_to_text_request(data: bytes, url: str) -> str:
     request = Request('{}/stt'.format(url), data=data, headers={'Content-Type': 'audio/wav'})
     result = json.loads(urlopen(request).read().decode('utf-8'))
 
@@ -68,20 +67,21 @@ def listener():
 
         if r is None:
             print("Use device_index=%s and sample_rate=%s" % (mic_device_index, SAMPLE_RATE))
-
-        r = Recognizer()
+            r = Recognizer()
 
         with Microphone(device_index=mic_device_index, sample_rate=SAMPLE_RATE) as source:
-            print('Adjusting for noise')
+
+            print('Adjusting for noise...')
             r.adjust_for_ambient_noise(source)
 
             print('Recording')
-            audio = r.listen(source, phrase_time_limit=PHRASE_TIME_LIMIT_SEC if PHRASE_TIME_LIMIT_SEC else None)
+            audio = r.listen(source, phrase_time_limit=PHRASE_TIME_LIMIT_SEC)
 
         print('Recognition')
         data = audio.get_raw_data(SAMPLE_RATE, 2)
+
         print(' {}'.format(pretty_size(len(data))), end='\r', flush=True)
-        text = stt(data, VOSK_API_URL)
+        text = sound_to_text_request(data, VOSK_API_URL)
 
         print('Result: ' + text)
 

@@ -40,6 +40,7 @@ services:
       VOSK_API_URL: http://vosk-api:8086
       SAMPLE_RATE: 16000
       PHRASE_TIME_LIMIT_SEC: 10
+      ALSA_MICROPHONE_NAME: mic
     volumes:
       - ./speech/listener/asoundrc.conf:/etc/asound.conf/asoundrc.conf:ro
     devices:
