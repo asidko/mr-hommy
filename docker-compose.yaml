@@ -87,6 +87,13 @@ services:
       - 5984:5984
     restart: on-failure
 
+  # Services listen and emit events using Redis.
+  redis:
+    image: redis
+    command: ["sh", "-c", "exec redis-server --requirepass \"${REDIS_PASSWORD}\""]
+    environment:
+      REDIS_PASSWORD: redisss333
+
   # Store and provide configuration for all applications
   # Example to store default configs or get existing:
   # POST http://localhost:8010/config/init/MY_APP_NAME  BODY: {"my_prop1: "value1", "my_prop2": "value2"}
